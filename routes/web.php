@@ -11,6 +11,5 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/','CurrenciesController@index');
+Route::get('/export','CurrenciesController@export');
