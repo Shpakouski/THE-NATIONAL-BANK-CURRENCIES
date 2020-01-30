@@ -39,8 +39,12 @@ class GetCurrenciesPerWeek extends Command
      */
     public function handle()
     {
-        for ($i = 0, $now = Carbon::now(); $i < 7; $i++) {
-            $day = $now->format('Y/m/d');
+        if(isset(Currency::where('Date', Carbon::today())->get()[0])){
+            $this->info('You have already uploaded currencies today! Try tomorrow!');
+            return;
+        }
+        for ($i = 0, $today = Carbon::today(); $i < 7; $i++) {
+            $day = $today->format('Y/m/d');
             $currenciesPerDay = json_decode(file_get_contents("http://www.nbrb.by/api/exrates/rates?ondate={$day}&periodicity=0"));
             foreach ($currenciesPerDay as $currency) {
                 Currency::create([
@@ -52,7 +56,8 @@ class GetCurrenciesPerWeek extends Command
                     'Cur_OfficialRate' => $currency->Cur_OfficialRate,
                 ]);
             }
-            $now = $now->subDay();
+            $today = $today->subDay();
         }
+        $this->info('All is ok! Now the currencies are uploaded to your database!');
     }
 }
